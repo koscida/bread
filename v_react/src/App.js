@@ -5,7 +5,7 @@ import GameBoard from "./components/GameBoard";
 function App() {
 	return (
 		<div className="App">
-			<div class="container">
+			<div className="container">
 				<BreadProvider>
 					<GameBoard />
 				</BreadProvider>
