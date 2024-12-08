@@ -20,16 +20,16 @@ function Recipe() {
 		loafType,
 		loafDensity,
 
-		eggType,
-		eggSize,
-		eggColor,
-
 		bakingTime,
 		ovenTemp,
 
 		panLining,
 		panSize,
 		panTop,
+
+		eggType,
+		eggSize,
+		eggColor,
 
 		editPage,
 

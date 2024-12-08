@@ -7,6 +7,7 @@ import Cooling from "./Cooling";
 import BreadCrumbs from "./navigation/BreadCrumbs";
 import Button from "./formComponents/Button";
 import Recipe from "./Recipe";
+import Loaf from "./Loaf";
 
 function GameBoard() {
 	const { boardState, nextPage } = useBread();
@@ -54,9 +55,7 @@ function GameBoard() {
 				</div>
 
 				<div className="col">
-					<h2>Loafs</h2>
-					<hr />
-					<p>No loafs yet</p>
+					<Loaf />
 				</div>
 			</div>
 

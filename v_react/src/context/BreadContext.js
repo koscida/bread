@@ -12,6 +12,7 @@ const states = {
 
 // // // // //
 // Options
+// value > name > label > extras
 
 // General
 const pronouns = [
@@ -33,16 +34,16 @@ const pronouns = [
 ];
 
 // Location Specific
-const locations = [
-	"Bakery",
-	"Home",
-	"Farm",
-	"Factory",
-	"Public",
-	"Car",
-	"Train/Bus",
-];
-const ambianceTypes = ["Covered", "Random", "Surprise", "Difficult", "Instant"];
+const locations = {
+	Bakery: { value: "Bakery", color: "#FF69B4" },
+	Home: { value: "Home", color: "#EEE8AA" },
+	Farm: { value: "Farm", color: "#98FB98" },
+	Factory: { value: "Factory", color: "#DAA520" },
+	Public: { value: "Public", color: "#00BFFF" },
+	Car: { value: "Car", color: "#778899" },
+	"Train/Bus": { value: "Train/Bus", color: "#DDA0DD" },
+};
+const ambianceTypes = ["Surprise", "Difficult", "Instant"];
 
 // Baker Specific
 const bakerStyles = [
@@ -140,6 +141,7 @@ const getMidPoint = (options) => {
 		if (typeof options[mid] === "object") {
 			if (options[mid].value) return options[mid].value;
 			if (options[mid].name) return options[mid].name;
+			if (options[mid].label) return options[mid].label;
 			return options[Object.keys(options)[0]];
 		}
 	} else {
@@ -147,13 +149,23 @@ const getMidPoint = (options) => {
 		return Object.keys(options)[mid];
 	}
 };
+const getFirstPoint = (options) => {
+	var first = 0;
+	if (!Array.isArray(options)) {
+		first = Object.keys(options)[0];
+	}
+	if (options[first].value) return options[first].value;
+	if (options[first].name) return options[first].name;
+	if (options[first].label) return options[first].label;
+	return options[first][Object.keys(options[first])[0]];
+};
 
 const BreadProvider = ({ children }) => {
 	const [boardState, setBoardState] = useState({
 		state: 0,
 		page: 0,
 
-		location: locations[0],
+		location: getFirstPoint(locations),
 		ambiance: ambianceTypes[0],
 		bakerStyle: bakerStyles[0],
 		bakerExperience: getMidPoint(bakerExperiences),
@@ -225,7 +237,7 @@ const BreadProvider = ({ children }) => {
 		value: boardState[name],
 		handleChange: ({ target: { value } }) => handleSet(name, value),
 		label,
-		options: Array.isArray(options) ? options : Object.values(options),
+		options,
 	});
 	const initRadio = (name, label, options) => ({
 		...initDropDown(name, label, options),

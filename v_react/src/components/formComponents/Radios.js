@@ -7,34 +7,49 @@ function Radios({ data: { id, label, name, value, options, handleChange } }) {
 				<b>{label}</b>
 			</label>
 
-			{options.map((val, i) => {
-				const { optionValue, optionLabel } =
-					typeof val === "object"
-						? {
-								optionValue: val.value ?? val.name,
-								optionLabel: val.label ?? val.value,
-						  }
-						: { optionValue: val, optionLabel: val };
-				return (
-					<div className="form-check" key={i}>
-						<input
-							className="form-check-input"
-							type="radio"
-							name={name}
-							id={`${name}-${optionValue}`}
-							value={optionValue}
-							checked={optionValue === value}
-							onChange={(e) => handleChange(e)}
-						/>
-						<label
-							className="form-check-label"
-							htmlFor={`${name}-${optionValue}`}
-						>
-							{optionLabel}
-						</label>
-					</div>
-				);
-			})}
+			{(Array.isArray(options) ? options : Object.values(options)).map(
+				(val, i) => {
+					const { optionValue, optionLabel } =
+						typeof val === "object"
+							? {
+									optionValue: val.value ?? val.name,
+									optionLabel: val.label ?? val.value,
+							  }
+							: { optionValue: val, optionLabel: val };
+					return (
+						<div className="form-check" key={i}>
+							<input
+								className="form-check-input"
+								type="radio"
+								name={name}
+								id={`${name}-${optionValue}`}
+								value={optionValue}
+								checked={optionValue === value}
+								onChange={(e) => handleChange(e)}
+							/>
+							<label
+								className="form-check-label"
+								htmlFor={`${name}-${optionValue}`}
+							>
+								{optionLabel}
+								{val.color ? (
+									<span
+										style={{
+											display: "inline-block",
+											width: "50px",
+											height: "10px",
+											marginLeft: "0.5em",
+											background: val.color,
+										}}
+									></span>
+								) : (
+									<></>
+								)}
+							</label>
+						</div>
+					);
+				}
+			)}
 		</div>
 	);
 }

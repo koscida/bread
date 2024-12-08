@@ -9,7 +9,7 @@ function Range({ data: { id, label, name, value, options, handleChange } }) {
 			</label>
 			<input
 				type="range"
-				class="form-range"
+				className="form-range"
 				min="0"
 				max={options.length - 1}
 				step="1"
