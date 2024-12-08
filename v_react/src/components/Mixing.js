@@ -1,7 +1,6 @@
 import React from "react";
 
-function Baking() {
+function Mixing() {
 	return <></>;
 }
-
-export default Baking;
+export default Mixing;

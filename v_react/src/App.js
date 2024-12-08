@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import { BreadProvider } from "./context/BreadContext";
 import GameBoard from "./components/GameBoard";
 

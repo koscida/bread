@@ -1,7 +1,7 @@
 import React from "react";
 
-function Baking() {
+function Cooling() {
 	return <></>;
 }
 
-export default Baking;
+export default Cooling;

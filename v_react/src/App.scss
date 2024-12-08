@@ -1,0 +1,28 @@
+h1 {
+	font-size: 2em;
+}
+h2 {
+	font-size: 1.75em;
+}
+h3 {
+	font-size: 1.5em;
+}
+h4 {
+	font-size: 1.3em;
+}
+
+.section {
+	border-bottom: 1px solid #0003;
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+
+	h5 {
+		margin-bottom: 1em;
+	}
+}
+
+.inputGrouping {
+	display: flex;
+	margin-bottom: 1em;
+	gap: 0.5em;
+}
