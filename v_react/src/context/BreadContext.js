@@ -2,84 +2,6 @@ import React, { createContext, useContext, useState } from "react";
 
 const BreadContext = createContext();
 
-// TODO:
-// baker style
-// kitchen location
-// different pan size
-// different eggs types
-
-// baking time
-// yest rising rate
-// bake longer
-// pan topper
-
-// const boardLabels = {
-// 	eggs: {
-// 		label: "Eggs",
-// 		name: "eggs",
-// 		init: 0,
-// 		category: "a",
-// 	},
-// 	milk: {
-// 		label: "Milk",
-// 		name: "milk",
-// 		init: 0,
-// 		category: "a",
-// 	},
-// 	flour: {
-// 		label: "Flour",
-// 		name: "flour",
-// 		init: 0,
-// 		category: "b",
-// 	},
-// 	water: {
-// 		label: "Water",
-// 		name: "water",
-// 		init: 0,
-// 		category: "b",
-// 	},
-// 	yest: {
-// 		label: "Yest",
-// 		name: "yest",
-// 		init: 0,
-// 		category: "c",
-// 	},
-// 	salt: {
-// 		label: "Salt",
-// 		name: "salt",
-// 		init: 0,
-// 		category: "c",
-// 	},
-// 	bakingSoda: {
-// 		label: "Baking Soda",
-// 		name: "bakingSoda",
-// 		init: 0,
-// 		category: "c",
-// 	},
-// 	bakingPowder: {
-// 		label: "Baking Powder",
-// 		name: "bakingPowder",
-// 		init: 0,
-// 		category: "c",
-// 	},
-// };
-// const boardCategories = Object.values(boardLabels).reduce(
-// 	(cats, { category, name }) => ({
-// 		...cats,
-// 		[category]: cats[category] ? [...cats[category], name] : [name],
-// 	}),
-// 	{}
-// );
-// const initBoardState = Object.values(boardLabels).reduce(
-// 	(bs, la) => ({
-// 		...bs,
-// 		[la.name]: la.init,
-// 	}),
-// 	{}
-// );
-const initBoardState = {};
-initBoardState["state"] = 0;
-
 const states = {
 	0: "Recipe",
 	1: "Mixing",
@@ -131,20 +53,41 @@ const bakerStyles = [
 	"Influencer",
 ];
 const bakerExperiences = [
-	"None",
-	"Apprentice",
-	"Journeyman",
-	"Professional",
-	"Expert",
+	{ value: 0, label: "None" },
+	{ value: 1, label: "Apprentice" },
+	{ value: 2, label: "Journeyman" },
+	{ value: 3, label: "Professional" },
+	{ value: 4, label: "Expert" },
 ];
 
 // Loaf Specific
 const loafTypes = ["Normal", "Magical"];
 const loafDensities = ["Wet", "Spongy", "Dense"];
-const loafTopTypes = ["Covered", "Locked", "Open"];
 
+// Pan
+const panSizes = [
+	{ value: 0, label: "Small" },
+	{ value: 1, label: "Medium" },
+	{ value: 2, label: "Large" },
+];
+const panTops = ["Covered", "Locked", "Open"];
 const panLinings = ["None", "Foil", "Silicon"];
 
+// Oven
+const bakingTimes = [
+	{ value: 0, label: "Short" },
+	{ value: 1, label: "Medium" },
+	{ value: 2, label: "Long" },
+];
+const ovenTemps = [
+	{ value: 0, label: "Extra Cold" },
+	{ value: 1, label: "Cold" },
+	{ value: 2, label: "Medium" },
+	{ value: 3, label: "Hot" },
+	{ value: 4, label: "Extra Hot" },
+];
+
+// Ingredients
 const eggTypes = [
 	"Conventional",
 	"Free Range",
@@ -152,19 +95,26 @@ const eggTypes = [
 	"Organic",
 	"Pasteurized",
 ];
-const eggSizes = {
-	jumbo: {
+const eggSizes = [
+	{ value: 0, label: "Peewee", name: "peewee", oz: 15, g: 32 },
+	{ value: 1, label: "Small", name: "small", oz: 18, g: 38 },
+	{ value: 2, label: "Medium", name: "medium", oz: 21, g: 44 },
+	{ value: 3, label: "Large", name: "large", oz: 24, g: 50 },
+	{
+		value: 4,
+		label: "Extra-large",
+		name: "extraLarge",
+		oz: 27,
+		g: 56,
+	},
+	{
+		value: 5,
 		label: "Jumbo",
 		name: "jumbo",
 		oz: 30,
 		g: 63,
 	},
-	extraLarge: { label: "Extra-large", name: "extraLarge", oz: 27, g: 56 },
-	large: { label: "Large", name: "large", oz: 24, g: 50 },
-	medium: { label: "Medium", name: "medium", oz: 21, g: 44 },
-	small: { label: "Small", name: "small", oz: 18, g: 38 },
-	peewee: { label: "Peewee", name: "peewee", oz: 15, g: 32 },
-};
+];
 const eggColors = [
 	"White",
 	"Brown",
@@ -184,58 +134,92 @@ const eggColors = [
 	"Random",
 ];
 
+const getMidPoint = (options) => {
+	if (Array.isArray(options)) {
+		const mid = Math.floor((options.length - 1) / 2);
+		if (typeof options[mid] === "object") {
+			if (options[mid].value) return options[mid].value;
+			if (options[mid].name) return options[mid].name;
+			return options[Object.keys(options)[0]];
+		}
+	} else {
+		const mid = Math.floor((Object.keys(options).length - 1) / 2);
+		return Object.keys(options)[mid];
+	}
+};
+
 const BreadProvider = ({ children }) => {
-	const [boardState, setBoardState] = useState(initBoardState);
+	const [boardState, setBoardState] = useState({
+		state: 0,
+		page: 0,
 
-	const handleIncrease = (name) => {
-		handleSet(name, boardState[name] + 1);
-	};
+		location: locations[0],
+		ambiance: ambianceTypes[0],
+		bakerStyle: bakerStyles[0],
+		bakerExperience: getMidPoint(bakerExperiences),
+		bakerPronouns: pronouns[0],
+		loafPronouns: pronouns[0],
+		loafType: loafTypes[0],
+		loafDensity: loafDensities[0],
+		panSize: getMidPoint(panSizes),
+		panLining: panLinings[0],
+		panTop: panTops[0],
+		bakingTime: getMidPoint(bakingTimes),
+		ovenTemp: getMidPoint(ovenTemps),
+		eggType: eggTypes[0],
+		eggSize: getMidPoint(eggSizes),
+		eggColor: eggColors[0],
+	});
 
+	// // // // //
+	// Handlers
+
+	// Private handlers
 	const handleSet = (name, val) => {
 		setBoardState({ ...boardState, [name]: val });
 	};
 
+	// Public Handlers
+	const nextPage = () => {
+		const newPage = boardState["page"] + 1;
+		const newState =
+			newPage > boardState["state"] ? newPage : boardState["state"];
+		setBoardState({
+			...boardState,
+			page: newPage,
+			state: newState,
+			editing: null,
+		});
+	};
+	const editPage = (page) => {
+		setBoardState({
+			...boardState,
+			editing: page,
+		});
+	};
+	const goToPage = (i) => {
+		setBoardState({
+			...boardState,
+			page: parseInt(i),
+		});
+	};
+
 	//
 	// // // //
-	// group vars
+	// Create vars
 
-	//
-	// Numerical
-	const panSize = {
-		label: "Pan Size",
-		name: "panSize",
-		id: "panSize",
-		value: boardState["panSize"],
-		handleChange: () => handleIncrease("panSize"),
-	};
-
-	const eggAmount = {
-		label: "Egg Amount",
-		name: "eggAmount",
-		id: "eggAmount",
-		value: boardState["eggAmount"],
-		handleChange: () => handleIncrease("eggAmount"),
-	};
-
-	const milk = {
-		label: "Milk",
-		name: "milk",
-		id: "milk",
-		value: boardState["milk"],
-		handleChange: () => handleIncrease("milk"),
-	};
-
-	const bakingTime = {
-		label: "Baking Time",
-		name: "bakingTime",
-		id: "bakingTime",
-		value: boardState["bakingTime"],
-		handleChange: () => handleIncrease("bakingTime"),
-	};
-
-	//
-	// Dropdowns
+	// Helpers for init vars with specific format
+	const initNumerical = (name, label) => ({
+		dataType: "integer",
+		name,
+		id: name,
+		value: boardState[name],
+		handleChange: ({ target: { value } }) =>
+			handleSet(name, parseInt(value)),
+		label,
+	});
 	const initDropDown = (name, label, options) => ({
+		dataType: "dropdown",
 		name,
 		id: name,
 		value: boardState[name],
@@ -243,12 +227,25 @@ const BreadProvider = ({ children }) => {
 		label,
 		options: Array.isArray(options) ? options : Object.values(options),
 	});
+	const initRadio = (name, label, options) => ({
+		...initDropDown(name, label, options),
+		dataType: "radio",
+	});
+	const initRange = (name, label, options) => ({
+		...initDropDown(name, label, options),
+		dataType: "range",
+	});
 
-	const location = initDropDown("location", "Location", locations);
-	const ambiance = initDropDown("ambiance", "Ambiance", ambianceTypes);
+	//
+	// Recipe Settings
 
-	const bakerStyle = initDropDown("bakerStyle", "Baker Style", bakerStyles);
-	const bakerExperience = initDropDown(
+	// Location
+	const location = initRadio("location", "Location", locations);
+	const ambiance = initRadio("ambiance", "Ambiance", ambianceTypes);
+
+	// Baker
+	const bakerStyle = initRadio("bakerStyle", "Baker Style", bakerStyles);
+	const bakerExperience = initRange(
 		"bakerExperience",
 		"Baker Experience",
 		bakerExperiences
@@ -259,24 +256,33 @@ const BreadProvider = ({ children }) => {
 		pronouns
 	);
 
+	// Loaf
 	const loafPronouns = initDropDown(
 		"loafPronouns",
 		"Loaf Pronouns",
 		pronouns
 	);
-	const loafType = initDropDown("loafType", "Loaf Type", loafTypes);
-	const loafTop = initDropDown("loafTop", "Loaf Top", loafTopTypes);
-	const loafDensity = initDropDown(
-		"loafDensity",
-		"Loaf Density",
-		loafDensities
-	);
+	const loafType = initRadio("loafType", "Loaf Type", loafTypes);
+	const loafDensity = initRadio("loafDensity", "Loaf Density", loafDensities);
 
-	const panLining = initDropDown("panLining", "Pan Lining", panLinings);
+	// Pan
+	const panSize = initRange("panSize", "Pan Size", panSizes);
+	const panLining = initRadio("panLining", "Pan Lining", panLinings);
+	const panTop = initRadio("panTop", "Pan Top", panTops);
 
-	const eggType = initDropDown("eggType", "Egg Type", eggTypes);
-	const eggSize = initDropDown("eggSize", "Egg Size", eggSizes);
+	// Oven
+	const bakingTime = initRange("bakingTime", "Baking Time", bakingTimes);
+	const ovenTemp = initRange("ovenTemp", "Oven Temp", ovenTemps);
+
+	// Ingredients
+	const eggType = initRadio("eggType", "Egg Type", eggTypes);
+	const eggSize = initRange("eggSize", "Egg Size", eggSizes);
 	const eggColor = initDropDown("eggColor", "Egg Color", eggColors);
+
+	//
+	// Mixing
+	const eggAmount = initNumerical("eggAmount", "Egg Amount");
+	const milkAmount = initNumerical("milkAmount", "Milk Amount");
 
 	//
 	// // // //
@@ -284,6 +290,7 @@ const BreadProvider = ({ children }) => {
 	return (
 		<BreadContext.Provider
 			value={{
+				boardState,
 				states,
 
 				location,
@@ -295,23 +302,25 @@ const BreadProvider = ({ children }) => {
 
 				loafPronouns,
 				loafType,
-				loafTop,
 				loafDensity,
+
+				bakingTime,
+				ovenTemp,
+
+				panLining,
+				panSize,
+				panTop,
 
 				eggType,
 				eggSize,
 				eggColor,
 
-				panLining,
-				panSize,
-				bakingTime,
 				// eggAmount,
-				// milk,
-				// time,
+				// milkAmount,
 
-				boardState,
-				handleIncrease,
-				handleSet,
+				nextPage,
+				editPage,
+				goToPage,
 			}}
 		>
 			{children}

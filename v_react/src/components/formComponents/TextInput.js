@@ -7,7 +7,7 @@ function TextInput({
 	return (
 		<div className="input-group">
 			<label className="form-label p-1 me-2" htmlFor={id}>
-				{label}
+				<b>{label}</b>
 			</label>
 
 			{addon ? (

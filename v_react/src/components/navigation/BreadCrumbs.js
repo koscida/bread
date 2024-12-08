@@ -3,16 +3,16 @@ import { useBread } from "../../context/BreadContext";
 
 function BreadCrumbs() {
 	const {
-		boardState: { state },
+		boardState: { page, state },
 		states,
-		handleSet,
+		goToPage,
 	} = useBread();
 
 	return (
 		<>
 			<div className="row mb-3">
 				{Object.values(states).map((stateName, i) => {
-					const s = i === state ? { fontWeight: "bold" } : {};
+					const s = i === page ? { fontWeight: "bold" } : {};
 					return (
 						<Fragment key={i}>
 							{i > 0 ? (
@@ -23,15 +23,10 @@ function BreadCrumbs() {
 								<></>
 							)}
 							<div className="col" style={s}>
-								{i < state ? (
-									<a
-										href="#"
-										onClick={() =>
-											handleSet("state", state - 1)
-										}
-									>
+								{i <= state && i !== page ? (
+									<button onClick={() => goToPage(i)}>
 										{stateName}
-									</a>
+									</button>
 								) : (
 									stateName
 								)}

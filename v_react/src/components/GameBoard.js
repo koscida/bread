@@ -1,26 +1,16 @@
 import React, { useState } from "react";
 import { useBread } from "../context/BreadContext";
-import Recipe from "./Recipe";
 import Mixing from "./Mixing";
 import Rising from "./Rising";
 import Baking from "./Baking";
 import Cooling from "./Cooling";
 import BreadCrumbs from "./navigation/BreadCrumbs";
 import Button from "./formComponents/Button";
+import Recipe from "./Recipe";
 
 function GameBoard() {
-	const { boardState, handleIncrease } = useBread();
-	const { state } = boardState;
-
-	const handleClickNext = () => {
-		let isValid = true;
-		// validation
-		// if (!(capacity.value > 0)) {
-		// 	isValid = false;
-		// }
-
-		if (isValid) handleIncrease("state");
-	};
+	const { boardState, nextPage } = useBread();
+	const { state, page, editing } = boardState;
 
 	const PrintBoardState = () => (
 		<>
@@ -32,8 +22,6 @@ function GameBoard() {
 					</div>
 				))}
 			</div>
-			<br />
-			<div>{JSON.stringify(boardState)}</div>
 		</>
 	);
 
@@ -48,20 +36,20 @@ function GameBoard() {
 					<hr />
 					<BreadCrumbs />
 					<div>
-						{state === 0 ? (
+						{page === 0 ? (
 							<Recipe />
-						) : state === 1 ? (
+						) : page === 1 ? (
 							<Mixing />
-						) : state === 2 ? (
+						) : page === 2 ? (
 							<Rising />
-						) : state === 3 ? (
+						) : page === 3 ? (
 							<Baking />
 						) : (
 							<Cooling />
 						)}
 					</div>
 					<div className="mb-3 pb-3 d-flex justify-content-end">
-						<Button label={"Next"} handleClick={handleClickNext} />
+						<Button label={"Next Page"} handleClick={nextPage} />
 					</div>
 				</div>
 

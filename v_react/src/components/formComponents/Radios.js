@@ -2,14 +2,16 @@ import React from "react";
 
 function Radios({ data: { id, label, name, value, options, handleChange } }) {
 	return (
-		<div className="input-group">
-			<label className="form-label p-1 me-2">{label}</label>
+		<div className="input-group flex-column">
+			<label className="form-label p-1 me-2">
+				<b>{label}</b>
+			</label>
 
 			{options.map((val, i) => {
 				const { optionValue, optionLabel } =
 					typeof val === "object"
 						? {
-								optionValue: val.value ?? val.label,
+								optionValue: val.value ?? val.name,
 								optionLabel: val.label ?? val.value,
 						  }
 						: { optionValue: val, optionLabel: val };
@@ -21,7 +23,7 @@ function Radios({ data: { id, label, name, value, options, handleChange } }) {
 							name={name}
 							id={`${name}-${optionValue}`}
 							value={optionValue}
-							selected={optionValue === value}
+							checked={optionValue === value}
 							onChange={(e) => handleChange(e)}
 						/>
 						<label
