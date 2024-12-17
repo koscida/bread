@@ -10,7 +10,7 @@ function BreadCrumbs() {
 
 	return (
 		<>
-			<div className="row mb-3">
+			<div className="breadcrumbs row mb-3">
 				{Object.values(states).map((stateName, i) => {
 					const s = i === page ? { fontWeight: "bold" } : {};
 					return (

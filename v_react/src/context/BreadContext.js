@@ -43,7 +43,11 @@ const locations = {
 	Car: { value: "Car", color: "#778899" },
 	"Train/Bus": { value: "Train/Bus", color: "#DDA0DD" },
 };
-const ambianceTypes = ["Surprise", "Difficult", "Instant"];
+const ambianceTypes = {
+	Surprise: { value: "Surprise", color: "#dcd010" },
+	Difficult: { value: "Difficult", color: "#cc2c2c" },
+	Instant: { value: "Instant", color: "#50e0b1" },
+};
 
 // Baker Specific
 const bakerStyles = [
@@ -166,7 +170,7 @@ const BreadProvider = ({ children }) => {
 		page: 0,
 
 		location: getFirstPoint(locations),
-		ambiance: ambianceTypes[0],
+		ambiance: getFirstPoint(ambianceTypes),
 		bakerStyle: bakerStyles[0],
 		bakerExperience: getMidPoint(bakerExperiences),
 		bakerPronouns: pronouns[0],

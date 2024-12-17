@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useBread } from "../context/BreadContext";
-import Mixing from "./Mixing";
-import Rising from "./Rising";
-import Baking from "./Baking";
-import Cooling from "./Cooling";
+import Recipe from "./pages/Recipe";
+import Mixing from "./pages/Mixing";
+import Rising from "./pages/Rising";
+import Baking from "./pages/Baking";
+import Cooling from "./pages/Cooling";
+import Loaf from "./loafCanvas/Loaf";
 import BreadCrumbs from "./navigation/BreadCrumbs";
-import Button from "./formComponents/Button";
-import Recipe from "./Recipe";
-import Loaf from "./Loaf";
+import Button from "./form/Button";
 
 function GameBoard() {
 	const { boardState, nextPage } = useBread();
@@ -36,7 +36,12 @@ function GameBoard() {
 					<h2>Baking</h2>
 					<hr />
 					<BreadCrumbs />
-					<div>
+					<div
+						style={{
+							"overflow-y": "scroll",
+							height: "calc(100vh - 40px)",
+						}}
+					>
 						{page === 0 ? (
 							<Recipe />
 						) : page === 1 ? (
@@ -55,6 +60,8 @@ function GameBoard() {
 				</div>
 
 				<div className="col">
+					<h2>Loaf</h2>
+					<hr />
 					<Loaf />
 				</div>
 			</div>

@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
-import Button from "./formComponents/Button";
-import { useBread } from "../context/BreadContext";
-import TextInput from "./formComponents/TextInput";
-import NumericalInput from "./formComponents/NumericalInput";
-import Dropdown from "./formComponents/Dropdown";
-import Radios from "./formComponents/Radios";
-import Input from "./formComponents/Input";
+import Button from "../form/Button";
+import { useBread } from "../../context/BreadContext";
+import TextInput from "../form/TextInput";
+import NumericalInput from "../form/NumericalInput";
+import Dropdown from "../form/Dropdown";
+import Radios from "../form/Radios";
+import Input from "../form/Input";
 
 function Recipe() {
 	const {

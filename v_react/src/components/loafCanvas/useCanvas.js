@@ -13,15 +13,6 @@ const useCanvas = (draw, options = {}) => {
 			frameCount++;
 			draw({ w: canvas.width, h: canvas.height }, context, frameCount);
 			animationFrameId = window.requestAnimationFrame(render);
-			// console.log(
-			// 	"--render: ",
-			// 	" frameCount: ",
-			// 	frameCount,
-			// 	" width: ",
-			// 	canvas.width,
-			// 	" height: ",
-			// 	canvas.height
-			// );
 		};
 		render();
 

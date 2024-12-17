@@ -1,3 +1,6 @@
+:root {
+	--bread-blue: #0d5da3;
+}
 h1 {
 	font-size: 2em;
 }
@@ -30,5 +33,14 @@ h4 {
 
 	> div {
 		flex: 1;
+	}
+}
+
+.breadcrumbs {
+	button {
+		background: none;
+		border: 0;
+		color: var(--bread-blue);
+		text-decoration: underline;
 	}
 }

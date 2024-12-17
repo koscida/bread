@@ -1,5 +1,5 @@
 import React from "react";
-import { useBread } from "../context/BreadContext";
+import { useBread } from "../../context/BreadContext";
 
 function Mixing() {
 	const {
@@ -29,6 +29,7 @@ function Mixing() {
 		<>
 			<div className="row">
 				<div className="col">
+					<h3></h3>
 					<div>
 						<h3>Location:</h3>
 						<p>
@@ -61,10 +62,6 @@ function Mixing() {
 							{panTop.value}
 						</p>
 					</div>
-				</div>
-				<div className="col">
-					<h4>Bowl</h4>
-					<hr />
 				</div>
 			</div>
 		</>
