@@ -1,19 +1,14 @@
-import React from "react";
-
-function Rect(ctx, x, y, w, h, options) {
-	const { fill, stroke } = options;
+function Rect(ctx, x, y, w, h, options = {}) {
+	const { fill, stroke, lineWidth } = options;
 
 	if (fill) {
-		ctx.fillStyle = fill;
+		ctx.fillStyle = fill ?? "black";
 		ctx.fillRect(x, y, w, h);
-		ctx.fill();
-	} else if (stroke) {
-		ctx.strokeStyle = stroke;
-		ctx.rect(x, y, w, h);
-		ctx.stroke();
-	} else {
-		ctx.rect(x, y, w, h);
-		ctx.fill();
+	}
+	if (stroke) {
+		ctx.strokeStyle = stroke ?? "black";
+		ctx.lineWidth = lineWidth ?? 1;
+		ctx.strokeRect(x, y, w, h);
 	}
 }
 

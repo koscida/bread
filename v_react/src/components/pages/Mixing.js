@@ -1,66 +1,28 @@
 import React from "react";
 import { useBread } from "../../context/BreadContext";
+import Input from "../form/Input";
 
 function Mixing() {
-	const {
-		location,
-		ambiance,
-
-		bakerStyle,
-		bakerExperience,
-		bakerPronouns,
-
-		loafPronouns,
-		loafType,
-		loafDensity,
-
-		bakingTime,
-		ovenTemp,
-
-		panLining,
-		panSize,
-		panTop,
-
-		eggType,
-		eggSize,
-		eggColor,
-	} = useBread();
+	const { sugarAmount, eggAmount, milkAmount, icingAmount } = useBread();
 	return (
 		<>
-			<div className="row">
-				<div className="col">
-					<h3></h3>
-					<div>
-						<h3>Location:</h3>
-						<p>
-							{location.value}, {ambiance.value}
-						</p>
+			<div className="section">
+				<div className="row">
+					<div className="col-2">
+						<h5>Baker</h5>
 					</div>
-					<div>
-						<h3>Baker ({bakerPronouns.value}):</h3>
-						<p>
-							Style: {bakerStyle.value}, Experience:{" "}
-							{
-								bakerExperience.options[bakerExperience.value]
-									.label
-							}
-						</p>
-					</div>
-					<div>
-						<h3>Loaf ({loafPronouns.value}):</h3>
-						<p>
-							Type: {loafType.value}, Density: {loafDensity.value}
-						</p>
-						<p>
-							Baking Time:{" "}
-							{bakingTime.options[bakingTime.value].label}, Oven
-							Temp: {ovenTemp.options[ovenTemp.value].label}
-						</p>
-						<p>
-							Pan Lining: {panLining.value}, Pan Size:{" "}
-							{panSize.options[panSize.value].label}, Pan Top:{" "}
-							{panTop.value}
-						</p>
+
+					<div className="col-10">
+						<div className="inputGrouping">
+							<Input data={eggAmount} />
+						</div>
+						<div className="inputGrouping">
+							<Input data={milkAmount} />
+						</div>
+						<div className="inputGrouping">
+							<Input data={sugarAmount} />
+							<Input data={icingAmount} />
+						</div>
 					</div>
 				</div>
 			</div>

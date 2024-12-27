@@ -10,8 +10,22 @@ function Range({ data: { id, label, name, value, options, handleChange } }) {
 			<input
 				type="range"
 				className="form-range"
-				min="0"
-				max={options.length - 1}
+				min={
+					Array.isArray(options)
+						? 0
+						: Object.values(options).reduce(
+								(m, o) => (o.value < m ? o.value : m),
+								Number.MAX_VALUE
+						  )
+				}
+				max={
+					Array.isArray(options)
+						? options.length - 1
+						: Object.values(options).reduce(
+								(m, o) => (o.value > m ? o.value : m),
+								Number.MIN_VALUE
+						  )
+				}
 				step="1"
 				id={id}
 				value={val}

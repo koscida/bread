@@ -50,13 +50,13 @@ const ambianceTypes = {
 };
 
 // Baker Specific
-const bakerStyles = [
-	"Medical",
-	"Magical",
-	"Anonymous",
-	"Domestic",
-	"Influencer",
-];
+const bakerStyles = {
+	Medical: { value: "Medical", color: "#FF4500" },
+	Magical: { value: "Magical", color: "#2E8B57" },
+	Anonymous: { value: "Anonymous", color: "#008080" },
+	Domestic: { value: "Domestic", color: "#FFA500" },
+	Influencer: { value: "Influencer", color: "#87CEFA" },
+};
 const bakerExperiences = [
 	{ value: 0, label: "None" },
 	{ value: 1, label: "Apprentice" },
@@ -66,23 +66,44 @@ const bakerExperiences = [
 ];
 
 // Loaf Specific
-const loafTypes = ["Normal", "Magical"];
-const loafDensities = ["Wet", "Spongy", "Dense"];
+const loafDensities = {
+	Wet: { value: "Wet", color: "#dcd010" },
+	Spongy: { value: "Spongy", color: "#cc2c2c" },
+	Dense: { value: "Dense", color: "#50e0b1" },
+};
+const loafExperiences = [
+	{ value: 0, label: "Beginner" },
+	{ value: 1, label: "Novice" },
+	{ value: 2, label: "Intermediate" },
+	{ value: 3, label: "Advanced" },
+	{ value: 4, label: "Elite" },
+];
 
 // Pan
-const panSizes = [
-	{ value: 0, label: "Small" },
-	{ value: 1, label: "Medium" },
-	{ value: 2, label: "Large" },
-];
-const panTops = ["Covered", "Locked", "Open"];
-const panLinings = ["None", "Foil", "Silicon"];
+const panSizes = {
+	1: { value: 1, label: "Small" },
+	2: { value: 2, label: "Medium" },
+	3: { value: 3, label: "Large" },
+};
+const panTypes = ["Normal", "Magical"];
+const panTops = {
+	1: { value: 1, label: "Open" },
+	2: { value: 2, label: "Covered" },
+	3: { value: 3, label: "Locked" },
+};
+const panLinings = {
+	None: { value: "None", color: "#F5FFFA" },
+	Foil: { value: "Foil", color: "#C0C0C0" },
+	Silicon: { value: "Silicon", color: "#B22222" },
+};
 
 // Oven
 const bakingTimes = [
 	{ value: 0, label: "Short" },
-	{ value: 1, label: "Medium" },
-	{ value: 2, label: "Long" },
+	{ value: 1, label: "" },
+	{ value: 2, label: "Medium" },
+	{ value: 3, label: "" },
+	{ value: 4, label: "Long" },
 ];
 const ovenTemps = [
 	{ value: 0, label: "Extra Cold" },
@@ -95,10 +116,10 @@ const ovenTemps = [
 // Ingredients
 const eggTypes = [
 	"Conventional",
-	"Free Range",
-	"Cage-Free",
-	"Organic",
 	"Pasteurized",
+	"Cage-Free",
+	"Free Range",
+	"Organic",
 ];
 const eggSizes = [
 	{ value: 0, label: "Peewee", name: "peewee", oz: 15, g: 32 },
@@ -120,37 +141,40 @@ const eggSizes = [
 		g: 63,
 	},
 ];
-const eggColors = [
-	"White",
-	"Brown",
-	"Black",
-	"Red",
-	"Orange",
-	"Yellow",
-	"Green",
-	"Blue",
-	"Purple",
-	"Pink",
-	"Indigo",
-	"Grey",
-	"Gold",
-	"Silver",
-	"Rainbow",
-	"Random",
-];
+const colors = {
+	White: { value: "White", color: "#F8F8FF" },
+	Brown: { value: "Brown", color: "#A0522D" },
+	Black: { value: "Black", color: "#000000" },
+	Red: { value: "Red", color: "#DC143C" },
+	Orange: { value: "Orange", color: "#FF7F50" },
+	Yellow: { value: "Yellow", color: "#FFD700" },
+	Green: { value: "Green", color: "#32CD32" },
+	Blue: { value: "Blue", color: "#1E90FF" },
+	Purple: { value: "Purple", color: "#9932CC" },
+	Pink: { value: "Pink", color: "#FF69B4" },
+	Indigo: { value: "Indigo", color: "#483D8B" },
+	Grey: { value: "Grey", color: "#696969" },
+	Gold: { value: "Gold", color: "#DAA520" },
+	Silver: { value: "Silver", color: "#A9A9A9" },
+};
 
 const getMidPoint = (options) => {
-	if (Array.isArray(options)) {
-		const mid = Math.floor((options.length - 1) / 2);
-		if (typeof options[mid] === "object") {
-			if (options[mid].value) return options[mid].value;
-			if (options[mid].name) return options[mid].name;
-			if (options[mid].label) return options[mid].label;
-			return options[Object.keys(options)[0]];
-		}
+	const isArray = Array.isArray(options);
+
+	const mid = isArray
+		? Math.floor((options.length - 1) / 2)
+		: Math.floor((Object.keys(options).length - 1) / 2);
+
+	const midOpt = isArray ? options[mid] : options[Object.keys(options)[mid]];
+
+	if (typeof midOpt === "string") return midOpt;
+	else if (typeof midOpt === "object") {
+		if (midOpt.value) return midOpt.value;
+		if (midOpt.name) return midOpt.name;
+		if (midOpt.label) return midOpt.label;
+		return mid;
 	} else {
-		const mid = Math.floor((Object.keys(options).length - 1) / 2);
-		return Object.keys(options)[mid];
+		return midOpt;
 	}
 };
 const getFirstPoint = (options) => {
@@ -158,10 +182,12 @@ const getFirstPoint = (options) => {
 	if (!Array.isArray(options)) {
 		first = Object.keys(options)[0];
 	}
-	if (options[first].value) return options[first].value;
-	if (options[first].name) return options[first].name;
-	if (options[first].label) return options[first].label;
-	return options[first][Object.keys(options[first])[0]];
+	const firstOpt = options[first];
+	if (typeof firstOpt === "string") return firstOpt;
+	else if (firstOpt.value) return firstOpt.value;
+	else if (firstOpt.name) return firstOpt.name;
+	else if (firstOpt.label) return firstOpt.label;
+	return first;
 };
 
 const BreadProvider = ({ children }) => {
@@ -171,20 +197,29 @@ const BreadProvider = ({ children }) => {
 
 		location: getFirstPoint(locations),
 		ambiance: getFirstPoint(ambianceTypes),
-		bakerStyle: bakerStyles[0],
+
+		bakerStyle: getFirstPoint(bakerStyles),
 		bakerExperience: getMidPoint(bakerExperiences),
-		bakerPronouns: pronouns[0],
-		loafPronouns: pronouns[0],
-		loafType: loafTypes[0],
-		loafDensity: loafDensities[0],
+		bakerPronouns: getFirstPoint(pronouns),
+
+		loafExperience: getMidPoint(loafExperiences),
+		loafPronouns: getFirstPoint(pronouns),
+		loafDensity: getFirstPoint(loafDensities),
 		panSize: getMidPoint(panSizes),
-		panLining: panLinings[0],
-		panTop: panTops[0],
+		panType: getFirstPoint(panTypes),
+		panLining: getFirstPoint(panLinings),
+		panTop: getFirstPoint(panTops),
 		bakingTime: getMidPoint(bakingTimes),
 		ovenTemp: getMidPoint(ovenTemps),
-		eggType: eggTypes[0],
+
+		eggType: getFirstPoint(eggTypes),
 		eggSize: getMidPoint(eggSizes),
-		eggColor: eggColors[0],
+		eggColor: getFirstPoint(colors),
+
+		sugarAmount: 0,
+		icingAmount: 0,
+		eggAmount: 0,
+		milkAmount: 0,
 	});
 
 	// // // // //
@@ -225,35 +260,51 @@ const BreadProvider = ({ children }) => {
 	// Create vars
 
 	// Helpers for init vars with specific format
-	const initNumerical = (name, label) => ({
-		dataType: "integer",
-		name,
+	const handelSetText =
+		(name) =>
+		({ target: { value } }) =>
+			handleSet(name, value);
+	const handleSetInt =
+		(name) =>
+		({ target: { value } }) =>
+			handleSet(name, parseInt(value));
+	const initBase = (name, label) => ({
 		id: name,
+		name,
 		value: boardState[name],
-		handleChange: ({ target: { value } }) =>
-			handleSet(name, parseInt(value)),
 		label,
 	});
-	const initDropDown = (name, label, options) => ({
-		dataType: "dropdown",
-		name,
-		id: name,
-		value: boardState[name],
-		handleChange: ({ target: { value } }) => handleSet(name, value),
-		label,
+	const initBaseOptions = (name, label, options) => ({
+		...initBase(name, label),
 		options,
+	});
+	const initNumerical = (name, label) => ({
+		...initBase(name, label),
+		dataType: "integer",
+		handleChange: handleSetInt(name),
+	});
+	const initDropDown = (name, label, options) => ({
+		...initBaseOptions(name, label, options),
+		dataType: "dropdown",
+		handleChange: handelSetText(name),
 	});
 	const initRadio = (name, label, options) => ({
 		...initDropDown(name, label, options),
 		dataType: "radio",
 	});
+	const initNumericalRadio = (name, label, options) => ({
+		...initBaseOptions(name, label, options),
+		dataType: "radio",
+		handleChange: handleSetInt(name),
+	});
 	const initRange = (name, label, options) => ({
-		...initDropDown(name, label, options),
+		...initBaseOptions(name, label, options),
 		dataType: "range",
+		handleChange: handleSetInt(name),
 	});
 
-	//
-	// Recipe Settings
+	// //
+	// Recipe
 
 	// Location
 	const location = initRadio("location", "Location", locations);
@@ -273,18 +324,23 @@ const BreadProvider = ({ children }) => {
 	);
 
 	// Loaf
+	const loafExperience = initRange(
+		"loafExperience",
+		"Loaf Experience",
+		loafExperiences
+	);
 	const loafPronouns = initDropDown(
 		"loafPronouns",
 		"Loaf Pronouns",
 		pronouns
 	);
-	const loafType = initRadio("loafType", "Loaf Type", loafTypes);
 	const loafDensity = initRadio("loafDensity", "Loaf Density", loafDensities);
 
 	// Pan
 	const panSize = initRange("panSize", "Pan Size", panSizes);
 	const panLining = initRadio("panLining", "Pan Lining", panLinings);
-	const panTop = initRadio("panTop", "Pan Top", panTops);
+	const panType = initRadio("panType", "Pan Type", panTypes);
+	const panTop = initNumericalRadio("panTop", "Pan Top", panTops);
 
 	// Oven
 	const bakingTime = initRange("bakingTime", "Baking Time", bakingTimes);
@@ -293,10 +349,15 @@ const BreadProvider = ({ children }) => {
 	// Ingredients
 	const eggType = initRadio("eggType", "Egg Type", eggTypes);
 	const eggSize = initRange("eggSize", "Egg Size", eggSizes);
-	const eggColor = initDropDown("eggColor", "Egg Color", eggColors);
+	const eggColor = initDropDown("eggColor", "Egg Color", colors);
 
-	//
+	// //
 	// Mixing
+
+	// Baker
+	const sugarAmount = initNumerical("sugarAmount", "Sugar Amount");
+	const icingAmount = initNumerical("icingAmount", "Icing Amount");
+
 	const eggAmount = initNumerical("eggAmount", "Egg Amount");
 	const milkAmount = initNumerical("milkAmount", "Milk Amount");
 
@@ -316,23 +377,26 @@ const BreadProvider = ({ children }) => {
 				bakerExperience,
 				bakerPronouns,
 
+				loafExperience,
 				loafPronouns,
-				loafType,
 				loafDensity,
+
+				panLining,
+				panType,
+				panSize,
+				panTop,
 
 				bakingTime,
 				ovenTemp,
-
-				panLining,
-				panSize,
-				panTop,
 
 				eggType,
 				eggSize,
 				eggColor,
 
-				// eggAmount,
-				// milkAmount,
+				sugarAmount,
+				eggAmount,
+				milkAmount,
+				icingAmount,
 
 				nextPage,
 				editPage,

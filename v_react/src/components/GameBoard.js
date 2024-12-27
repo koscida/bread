@@ -38,9 +38,11 @@ function GameBoard() {
 					<BreadCrumbs />
 					<div
 						style={{
-							"overflow-y": "scroll",
-							height: "calc(100vh - 40px)",
+							overflowY: "scroll",
+							overflowX: "hidden",
+							height: "calc(100vh - 220px)",
 						}}
+						className="pe-3"
 					>
 						{page === 0 ? (
 							<Recipe />

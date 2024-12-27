@@ -1,6 +1,18 @@
 import React from "react";
 
 function Radios({ data: { id, label, name, value, options, handleChange } }) {
+	if (name === "panTop") {
+		console.log(
+			" label: ",
+			label,
+			" name: ",
+			name,
+			" value: ",
+			value,
+			" options: ",
+			options
+		);
+	}
 	return (
 		<div className="input-group flex-column">
 			<label className="form-label p-1 me-2">
@@ -12,10 +24,13 @@ function Radios({ data: { id, label, name, value, options, handleChange } }) {
 					const { optionValue, optionLabel } =
 						typeof val === "object"
 							? {
-									optionValue: val.value ?? val.name,
-									optionLabel: val.label ?? val.value,
+									optionValue:
+										val.value ?? val.name ?? val.label,
+									optionLabel:
+										val.label ?? val.value ?? val.name,
 							  }
 							: { optionValue: val, optionLabel: val };
+
 					return (
 						<div className="form-check" key={i}>
 							<input
@@ -25,7 +40,7 @@ function Radios({ data: { id, label, name, value, options, handleChange } }) {
 								id={`${name}-${optionValue}`}
 								value={optionValue}
 								checked={optionValue === value}
-								onChange={(e) => handleChange(e)}
+								onChange={handleChange}
 							/>
 							<label
 								className="form-check-label"

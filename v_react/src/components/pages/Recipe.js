@@ -16,14 +16,15 @@ function Recipe() {
 		bakerExperience,
 		bakerPronouns,
 
+		loafExperience,
 		loafPronouns,
-		loafType,
 		loafDensity,
 
 		bakingTime,
 		ovenTemp,
 
 		panLining,
+		panType,
 		panSize,
 		panTop,
 
@@ -32,10 +33,6 @@ function Recipe() {
 		eggColor,
 
 		editPage,
-
-		// eggAmount,
-		// milk,
-		// time,
 		boardState,
 	} = useBread();
 	const { state, editing } = boardState;
@@ -74,13 +71,13 @@ function Recipe() {
 					<div className="col-10">
 						<div className="inputGrouping">
 							<Input data={bakerStyle} isEditing={isEditing} />
+							<Input data={bakerPronouns} isEditing={isEditing} />
+						</div>
+						<div className="inputGrouping">
 							<Input
 								data={bakerExperience}
 								isEditing={isEditing}
 							/>
-						</div>
-						<div className="inputGrouping">
-							<Input data={bakerPronouns} isEditing={isEditing} />
 						</div>
 					</div>
 				</div>
@@ -94,11 +91,14 @@ function Recipe() {
 
 					<div className="col-10">
 						<div className="inputGrouping">
+							<Input data={loafDensity} isEditing={isEditing} />
 							<Input data={loafPronouns} isEditing={isEditing} />
 						</div>
 						<div className="inputGrouping">
-							<Input data={loafType} isEditing={isEditing} />
-							<Input data={loafDensity} isEditing={isEditing} />
+							<Input
+								data={loafExperience}
+								isEditing={isEditing}
+							/>
 						</div>
 					</div>
 				</div>
@@ -115,6 +115,7 @@ function Recipe() {
 							<Input data={panSize} isEditing={isEditing} />
 						</div>
 						<div className="inputGrouping">
+							<Input data={panType} isEditing={isEditing} />
 							<Input data={panLining} isEditing={isEditing} />
 							<Input data={panTop} isEditing={isEditing} />
 						</div>
@@ -130,8 +131,8 @@ function Recipe() {
 
 					<div className="col-10">
 						<div className="inputGrouping">
-							<Input data={bakingTime} isEditing={isEditing} />
 							<Input data={ovenTemp} isEditing={isEditing} />
+							<Input data={bakingTime} isEditing={isEditing} />
 						</div>
 					</div>
 				</div>
