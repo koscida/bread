@@ -1,5 +1,274 @@
 <!DOCTYPE html>
 <html>
-	<head></head>
-	<body></body>
+	<head>
+		<!-- Meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- jQuery -->
+		<script src="https://releases.jquery.com/git/jquery-3.x-git.min.js" crossorigin="anonymous"></script>		
+		
+		<!-- Bootstrap CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+		<style>
+			/* Prevent scrolling */
+            html, body {
+                overflow: hidden;
+                height: 100%;
+            }
+
+			#canvas {
+				border: 1px solid #000;
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<!-- Left Column -->
+				<div class="col-2 bg-light">
+					<h3>Left Column</h3>
+					<p>Content for the left column goes here.</p>
+
+					<!-- Energy Bar Values Display -->
+					<div id="energy-display">
+						<p>Top Energy: <span id="top-energy-value">0</span></p>
+						<p>Bottom Energy: <span id="bottom-energy-value">0</span></p>
+					</div>
+
+					<!-- Bowl Size Display -->
+					<div id="circle-diameter-display">
+						<p>Large Bowl Width: <span id="large-bowl-width">0</span></p>
+						<p>Large Bowl Height: <span id="large-bowl-height">0</span></p>
+
+						<p>Small Bowl Width: <span id="small-bowl-width">0</span></p>
+						<p>Small Bowl Height: <span id="small-bowl-height">0</span></p>
+						
+						<p>Spout Width: <span id="spout-width">0</span></p>
+						<p>Spout Height: <span id="spout-height">0</span></p>
+					</div>
+
+					<!-- Game State Display -->
+					<div id="game-state-display">
+						<p>Current State: <span id="current-state">Mixing</span></p>
+						<button id="next-state-button" class="btn btn-primary">Next Stage</button>
+					</div>
+
+				</div>
+
+				<!-- Center Column -->
+				<div class="col-8" id="canvas-container">
+					<!-- Canvas Element -->
+					<canvas id="canvas" style="border:1px solid #000; width: 100%;"></canvas>
+				</div>
+
+				<!-- Right Column -->
+				<div class="col-2 bg-light">
+					<h3>Right Column</h3>
+					<p>Content for the right column goes here.</p>
+					
+				</div>
+			</div>
+		</div>
+		
+		<!-- Bootstrap JS -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+		<script>
+			/* 
+			0: help, sit, kin
+			1: cont/dia, gro
+			2: crow/rof
+			3: sp, re-do, hold
+			*/
+
+			$(document).ready(function() {
+				// Canvas size
+				let canvasWidth = 0;
+				let canvasHeight = 0;
+
+				// HUD
+				const hudHeight = 50;
+
+				// Energy bar values (0 to 100)
+				let topEnergy = 100; // Initial value for the top energy bar
+				let bottomEnergy = 100; // Initial value for the bottom energy bar
+
+				// Game states
+				const gameStates = ['Mixing', 'Proofing', 'Baking'];
+    			let gameStateIndex = 0; // Start with the first state
+
+				// Variables to control the diameters of the bowl
+				let largeBowlWidth = 400; // Initial width of the top bowl
+				let largeBowlHeight = 400; // Initial height of the top bowl
+				let smallBowlWidth = 100; // Initial width of the bottom bowl
+				let smallBowlHeight = 100; // Initial height of the bottom bowl
+
+				// Variables to control the dimensions of the spout
+				let spoutWidth = 200; // Initial width of the spout
+				let spoutHeight = 50; // Initial height of the spout
+
+				// Color
+				let hue = 0; // Initialize hue value
+                const saturation = 100; // Saturation percentage
+                const lightness = 50; // Lightness percentage
+
+				// Function to update the game state display
+				function updateGameStateDisplay() {
+					const currentState = gameStates[gameStateIndex];
+					$('#current-state').text(currentState); // Update the HUD and left column
+				}
+
+				// Function to update the circle diameter display
+				function updateBowlDisplay() {
+					$('#large-bowl-width').text(largeBowlWidth); // Update top circle diameter
+					$('#large-bowl-height').text(largeBowlHeight); // Update top circle diameter
+					$('#small-bowl-width').text(smallBowlWidth); // Update bottom circle diameter
+					$('#small-bowl-height').text(smallBowlHeight); // Update bottom circle diameter
+					$('#spout-width').text(spoutWidth); // Update rectangle width
+					$('#spout-height').text(spoutHeight); // Update rectangle height
+				}
+
+				// Event listener for the "Next Stage" button
+				$('#next-state-button').click(function () {
+					gameStateIndex = (gameStateIndex + 1) % gameStates.length; // Move to the next state
+					updateGameStateDisplay();
+				});
+
+				// Function to redraw the canvas
+                function redrawCanvas() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Clear the canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw the bowl
+					drawBowl(canvas, ctx)
+
+					// Draw the HUD
+                    drawHUD(canvas, ctx);
+                }
+
+				// Function to draw the Bowl
+                function drawBowl(canvas, ctx) {
+					// Calculate the center positions
+					const centerX = canvasWidth / 2;
+					const centerY = (canvasHeight - hudHeight) / 2;
+					
+					// Draw the large bowl (top rounded square)
+					const largeBowlX = centerX - largeBowlWidth / 2; // Top-left X position
+					const largeBowlY = centerY - (largeBowlHeight / 2) - (spoutHeight / 2); // Top-left Y position
+					const largeBowlRadius = Math.min(largeBowlWidth, largeBowlHeight) / 4; // Radius for rounded corners
+					ctx.beginPath();
+					ctx.moveTo(largeBowlX + largeBowlRadius, largeBowlY);
+					ctx.lineTo(largeBowlX + largeBowlWidth - largeBowlRadius, largeBowlY);
+					ctx.quadraticCurveTo(largeBowlX + largeBowlWidth, largeBowlY, largeBowlX + largeBowlWidth, largeBowlY + largeBowlRadius);
+					ctx.lineTo(largeBowlX + largeBowlWidth, largeBowlY + largeBowlHeight - largeBowlRadius);
+					ctx.quadraticCurveTo(largeBowlX + largeBowlWidth, largeBowlY + largeBowlHeight, largeBowlX + largeBowlWidth - largeBowlRadius, largeBowlY + largeBowlHeight);
+					ctx.lineTo(largeBowlX + largeBowlRadius, largeBowlY + largeBowlHeight);
+					ctx.quadraticCurveTo(largeBowlX, largeBowlY + largeBowlHeight, largeBowlX, largeBowlY + largeBowlHeight - largeBowlRadius);
+					ctx.lineTo(largeBowlX, largeBowlY + largeBowlRadius);
+					ctx.quadraticCurveTo(largeBowlX, largeBowlY, largeBowlX + largeBowlRadius, largeBowlY);
+					ctx.closePath();
+					ctx.fillStyle = '#FF5733'; // Example color for the large bowl
+					ctx.fill();
+
+					// Draw the spout (rectangle between the two bowls)
+					const spoutX = centerX - spoutWidth / 2; // Center the spout horizontally
+					const spoutY = largeBowlY + largeBowlHeight; // Position the spout to touch the bottom of the large bowl
+					ctx.fillStyle = '#00FF00'; // Example color for the spout
+					ctx.fillRect(spoutX, spoutY, spoutWidth, spoutHeight);
+
+					// Draw the small bowl (bottom rounded square)
+					const smallBowlX = centerX - smallBowlWidth / 2; // Top-left X position
+					const smallBowlY = spoutY + spoutHeight; // Top-left Y position
+					const smallBowlRadius = Math.min(smallBowlWidth, smallBowlHeight) / 4; // Radius for rounded corners
+					ctx.beginPath();
+					ctx.moveTo(smallBowlX + smallBowlRadius, smallBowlY);
+					ctx.lineTo(smallBowlX + smallBowlWidth - smallBowlRadius, smallBowlY);
+					ctx.quadraticCurveTo(smallBowlX + smallBowlWidth, smallBowlY, smallBowlX + smallBowlWidth, smallBowlY + smallBowlRadius);
+					ctx.lineTo(smallBowlX + smallBowlWidth, smallBowlY + smallBowlHeight - smallBowlRadius);
+					ctx.quadraticCurveTo(smallBowlX + smallBowlWidth, smallBowlY + smallBowlHeight, smallBowlX + smallBowlWidth - smallBowlRadius, smallBowlY + smallBowlHeight);
+					ctx.lineTo(smallBowlX + smallBowlRadius, smallBowlY + smallBowlHeight);
+					ctx.quadraticCurveTo(smallBowlX, smallBowlY + smallBowlHeight, smallBowlX, smallBowlY + smallBowlHeight - smallBowlRadius);
+					ctx.lineTo(smallBowlX, smallBowlY + smallBowlRadius);
+					ctx.quadraticCurveTo(smallBowlX, smallBowlY, smallBowlX + smallBowlRadius, smallBowlY);
+					ctx.closePath();
+					ctx.fillStyle = '#33C1FF'; // Example color for the small bowl
+					ctx.fill();
+
+					// Update the circle and rectangle dimension displays
+					updateBowlDisplay();
+				}
+
+				// Function to draw the HUD
+                function drawHUD(canvas, ctx) {
+                    // Calculate rectangle dimensions
+					const hudWidth = canvasWidth;
+					const energyWidth = hudWidth * 0.3; // 30% of the HUD width
+					const energyHeight = 15; // 15px height
+					const spacing = 5; // 5px spacing between rectangles
+					const rightMargin = 5; // 5px from the right edge
+					const topMargin = 5; // Top rectangle's Y position
+					const bottomRectY = topMargin + energyHeight + spacing; // Bottom rectangle's Y position
+
+					// Draw HUD background
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(0, 0, hudWidth, hudHeight);
+
+                    // Draw current game state in the HUD
+					ctx.fillStyle = '#FFFFFF';
+					ctx.font = '20px Arial';
+					ctx.textAlign = 'center'; // Center-align the text
+					ctx.fillText(gameStates[gameStateIndex], hudWidth / 2, 30);
+
+					// Draw top energy bar
+					ctx.fillStyle = topEnergy > 0 ? '#FF5733' : '#D3D3D3'; // Full color if > 0, light grey if 0
+					const topBarWidth = (energyWidth * topEnergy) / 100; // Scale width based on energy value
+					ctx.fillRect(hudWidth - energyWidth - rightMargin, topMargin, topBarWidth, energyHeight);
+
+					// Label for top energy bar
+					ctx.fillStyle = '#FFFFFF'; // White color for the label
+					ctx.font = '15px Arial';
+					ctx.textAlign = 'right'; // Align text to the right
+					ctx.textBaseline = 'middle'; // Vertically center the text
+					ctx.fillText('A', hudWidth - energyWidth - rightMargin - spacing, topMargin + energyHeight / 2);
+
+					// Draw bottom energy bar
+					ctx.fillStyle = bottomEnergy > 0 ? '#33C1FF' : '#D3D3D3'; // Full color if > 0, light grey if 0
+					const bottomBarWidth = (energyWidth * bottomEnergy) / 100; // Scale width based on energy value
+					ctx.fillRect(hudWidth - energyWidth - rightMargin, bottomRectY, bottomBarWidth, energyHeight);
+
+					// Label for bottom energy bar
+					ctx.fillStyle = '#FFFFFF'; // White color for the label
+					ctx.font = '15px Arial';
+					ctx.textAlign = 'right'; // Align text to the right
+					ctx.textBaseline = 'middle'; // Vertically center the text
+					ctx.fillText('B', hudWidth - energyWidth - rightMargin - spacing, bottomRectY + energyHeight / 2);
+                }
+
+				// Set canvas size to match the right column size
+				function resizeCanvas() {
+					canvasWidth = $('#canvas-container').width();
+					canvasHeight = $(window).height() - 1;
+					$('#canvas').attr('width', canvasWidth);
+					$('#canvas').attr('height', canvasHeight);
+				}
+				// Resize canvas on document load
+				resizeCanvas();
+				// Resize canvas on window resize
+				$(window).resize(function() {
+					resizeCanvas();
+				});
+
+				// Set a timer to redraw the canvas every 100 milliseconds
+                setInterval(redrawCanvas, 100);
+			});
+		</script>
+	</body>
 </html>
