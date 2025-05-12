@@ -2,3 +2,6 @@ v_react/node_modules
 
 v_react/src/data
 v_react/src/data/*
+
+raw/assets
+raw/assets/*
