@@ -70,17 +70,33 @@
 
 					<!-- Bowl Size Display -->
 					<div id="circle-diameter-display">
-						<p>Large Bowl Width: <span id="large-bowl-width">0</span></p>
-						<p>Large Bowl Height: <span id="large-bowl-height">0</span></p>
-
-						<p>Small Bowl Width: <span id="small-bowl-width">0</span></p>
-						<p>Small Bowl Height: <span id="small-bowl-height">0</span></p>
-						
-						<p>Spout Width: <span id="spout-width">0</span></p>
-						<p>Spout Height: <span id="spout-height">0</span></p>
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th></th>
+									<th>Width</th>
+									<th>Height</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Large Bowl</td>
+									<td><span id="large-bowl-width">0</span></td>
+									<td><span id="large-bowl-height">0</span></td>
+								</tr>
+								<tr>
+									<td>Small Bowl</td>
+									<td><span id="small-bowl-width">0</span></td>
+									<td><span id="small-bowl-height">0</span></td>
+								</tr>
+								<tr>
+									<td>Spout</td>
+									<td><span id="spout-width">0</span></td>
+									<td><span id="spout-height">0</span></td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
-
-					
 
 				</div>
 
@@ -123,15 +139,17 @@
 
 				// HUD
 				let hudWidth = canvasWidth;
-				let hudHeight = 50;
-				let hudHeightMid = 25;
+				let hudHeight = 65;
+				let hudHeightMid = hudHeight / 2;
 				let barWidth = canvasWidth * 0.3; // 30% of the HUD width;
 				let	barHeight = 15; // 15px height
 				let	spacing = 5; // 5px spacing between elements
+				let halfSpacing = spacing / 2; // Half spacing for centering elements
 				let hudTimerOffset = 150; // Offset for the timer bar
 
 				// Energy bar values (0 to 100)
 				let topEnergy = 100; // Initial value for the top energy bar
+				let middleEnergy = 100; // Initial value for the middle energy bar
 				let bottomEnergy = 100; // Initial value for the bottom energy bar
 
 				// Game states
@@ -139,16 +157,18 @@
     			let gameStateIndex = 0; // Start with the first state
 
 				// Timer variables
+				let timer = 0; // Timer variable
+				let timerInterval = 100; // Timer interval
 				//let timerDuration = [30, 120, 60];
-				let timerDuration = [6,6,6]; // 2 minutes in seconds
+				let timerDuration = [60, 60, 60]; // 2 minutes in seconds
 				let timerLapsed = 0; // Time remaining for the current state
 				let timerPaused = false; // Track whether the timer is paused
 				let timerStopped = false; // Track whether the timer is stopped
 
 				// Variables for button dimensions and positions
-				const buttonDiameter = barHeight * 1.35; // Radius is half the barHeight
+				const buttonDiameter = barHeight * 1.15; // Radius is half the barHeight
 				const buttonRadius = buttonDiameter / 2; // Radius is half the barHeight
-	
+				// Button paths
 				const redoPath = `
 					M 456,256
 					A 200 200 0 1,0 256 456
@@ -162,6 +182,7 @@
 					L 531,281
 					z
 				`;
+				// Button data
 				let buttons = [
 					{ label: 'Previous', 		action: 'previous', 	svgPath: 'M320 64v384L64 256l256-192zm64 0h64v384h-64V64z' },
 					{ label: 'Rewind', 			action: 'rewind', 		svgPath: 'M448 64L256 256l192 192V64zm-192 0L64 256l192 192V64z' },
@@ -236,19 +257,32 @@
 
 
 				// // // // // // //
-				// Update
+				// Set Intervals
 
-				// Function to update the canvas
-				function updateCanvas() {
+				// Set a timer to redraw the canvas every frame
+				setInterval(function(){
+					// Function to update the canvas
+
 					// Update the timer
-					updateTimer();
+					updateTimer(timer);
 
-					// Update spout dimensions
-					updateBowlDimensions();
-				}
+					// Update the canvas
+					updateCanvas(timer);
 
-				// Function to update the timer bar
-				function updateTimer() {
+					// Draw the updated canvas
+					drawCanvas(timer);
+				}, timerInterval);
+
+
+				// // // // // // //
+				// Update 
+
+				// Function to update the timer bar each frame
+				function updateTimer(timer) {
+					// Update the frame timer
+					timer += timerInterval;
+
+					// Update the canvas timer
 					if (!timerPaused && !timerStopped) {
 						// Decrease the timer
 						timerLapsed++;
@@ -261,8 +295,18 @@
 					}
 				}
 
+				// Function to update the canvas each frame
+				function updateCanvas(timer) {
+
+					// Update bowl and spout dimensions
+					updateBowlDimensions(timer);
+				}
+
+
+				// Helpers
+
 				// Function to update the spout dimensions during the Proofing state
-				function updateBowlDimensions() {
+				function updateBowlDimensions(timer) {
 					// Calculate the progress of the timer (0 to 1)
 					const timerProgres = timerLapsed / timerDuration[gameStateIndex];
 
@@ -301,8 +345,6 @@
 					}
 				}
 
-				// Update - Helpers
-
 				// Skip game state
 				function nextGameState() {
 					gameStateIndex = (gameStateIndex + 1) % gameStates.length; // Move to the next state
@@ -334,8 +376,8 @@
 				// // // // // // //
 				// Draw
 
-				// Function to redraw the canvas
-                function drawCanvas() {
+				// Function to redraw the canvas each frame
+                function drawCanvas(timer) {
 					// Show the column display
 					showColumnDisplay();
 
@@ -352,6 +394,9 @@
                     drawHUD(ctx);
                 }
 
+
+				// Helpers
+
 				// Function to update the column display
 				function showColumnDisplay() {
 					// Game state display
@@ -367,13 +412,190 @@
 					$('#bottom-energy-value').text(bottomEnergy); // Update bottom energy value
 
 					// Bowl size display
-					$('#large-bowl-width').text(largeBowlWidth); // Update top circle diameter
-					$('#large-bowl-height').text(largeBowlHeight); // Update top circle diameter
-					$('#small-bowl-width').text(smallBowlWidth); // Update bottom circle diameter
-					$('#small-bowl-height').text(smallBowlHeight); // Update bottom circle diameter
-					$('#spout-width').text(spoutWidth); // Update rectangle width
-					$('#spout-height').text(spoutHeight); // Update rectangle height
+					$('#large-bowl-width').text(Math.round(largeBowlWidth)); // Update top circle diameter
+					$('#large-bowl-height').text(Math.round(largeBowlHeight)); // Update top circle diameter
+					$('#small-bowl-width').text(Math.round(smallBowlWidth)); // Update bottom circle diameter
+					$('#small-bowl-height').text(Math.round(smallBowlHeight)); // Update bottom circle diameter
+					$('#spout-width').text(Math.round(spoutWidth)); // Update rectangle width
+					$('#spout-height').text(Math.round(spoutHeight)); // Update rectangle height
 				}
+
+				// Function to draw the HUD
+                function drawHUD(ctx) {
+
+					// //
+					// Background
+
+					// Draw HUD background
+					drawRectangle({
+						ctx,
+						x: 0,
+						y: 0,
+						width: hudWidth,
+						height: hudHeight,
+						fillStyle: 'rgba(0, 0, 0, 0.5)' // Semi-transparent black background
+					});
+
+
+					// //
+					// Game State
+
+                    // Draw the current game state
+					drawText({
+						ctx,
+						text: gameStates[gameStateIndex],
+						x: hudTimerOffset / 2, // X position of the game state text
+						y: hudHeightMid,
+						fontSize: 20,
+					});
+
+					// Draw the stage boxes
+					const boxHeight = barHeight; // Height of the stage box
+					const boxWidth = boxHeight; // Width of each stage box
+					const stageX = hudTimerOffset;
+					const stageY = halfSpacing; // Y position of the stage boxes
+					// Draw box for each stage
+					gameStates.forEach((state, index) => {
+						const boxX = stageX + (index * (boxWidth + spacing)); // X position of the stage box
+						
+						// Draw the stage box background
+						drawRectangle({
+							ctx,
+							x: boxX,
+							y: stageY,
+							width: boxWidth,
+							height: boxHeight,
+							fillStyle: (index === gameStateIndex 
+								? '#FFD700' // Yellow for active 
+								: ((index < gameStateIndex)
+									? '#636363' // Dark grey for completed
+									: '#D3D3D3' // Light grey for upcoming
+								))
+						});
+					});
+
+
+					// //
+					// Timer
+
+					// Draw the timer bar
+					const timerBarWidth = barWidth * (timerLapsed / timerDuration[gameStateIndex]); // Scale width based on remaining time
+					const timerBarX = hudTimerOffset; // Position the timer bar to the right of the game state
+					const timerBarY = stageY + barHeight + spacing; // Y position of the timer bar
+					// Draw the background (light grey bar)
+					drawRectangle({
+						ctx,
+						x: timerBarX,
+						y: timerBarY,
+						width: barWidth,
+						height: barHeight,
+						fillStyle: '#D3D3D3' // Light grey color for the background
+					});
+					// Draw the timer bar (foreground)
+					drawRectangle({
+						ctx,
+						x: timerBarX,
+						y: timerBarY,
+						width: timerBarWidth,
+						height: barHeight,
+						fillStyle: '#FFD700' // Yellow for the timer bar
+					});
+
+					// Timer Buttons
+					const buttonY = timerBarY + barHeight + spacing + buttonRadius; // Position the buttons below the timer bar
+					// Draw the timer buttons (circles)
+					buttons.forEach((button, index) => {
+						const {x, svgPath, style} = button;
+
+						// Draw the circle
+						drawCircle({
+							ctx,
+							x: x,
+							y: buttonY,
+							radius: buttonRadius,
+							fillStyle: '#AAAAAA', // Light grey color for the circle
+							strokeStyle: '#000000', // Black border for the circle
+						});
+
+						// Draw the svg
+						const svgHeight = buttonDiameter * 0.65; // Scale the SVG icon to fit inside the circle
+						const svgX = x - (svgHeight * 0.5); // Center the SVG icon in the circle
+						const svgY = buttonY - (svgHeight * 0.5); // Center the SVG icon in the circle
+						drawSVGPath(ctx, button.svgPath, svgX, svgY, svgHeight, '#000000', style); // Draw the SVG icon
+					});
+
+
+					// //
+					// Energy
+
+					// Calculate rectangle dimensions
+					const barX = hudWidth - barWidth - spacing; // X position for the labels
+					const textX = barX - spacing; // X position for the labels
+					
+					// Draw top energy bar
+					const topBarY = spacing; // Top bar's Y position
+					const topBarWidth = (barWidth * topEnergy) / 100; // Scale width based on energy value
+					drawRectangle({
+						ctx,
+						x: barX,
+						y: topBarY,
+						width: topBarWidth,
+						height: barHeight,
+						fillStyle: topEnergy > 0 ? '#FF5733' : '#D3D3D3'
+					});
+					// Label for top energy bar
+					drawText({
+						ctx,
+						text: 'PN',
+						x: textX,
+						y: topBarY + barHeight / 2,
+						color: '#FFFFFF',
+						textAlign: 'right',
+					});
+
+					// Draw middle energy bar
+					const middleBarY = topBarY + barHeight + spacing; // Middle bar's Y position
+					const middleBarWidth = (barWidth * middleEnergy) / 100; // Scale width based on energy value
+					drawRectangle({
+						ctx,
+						x: barX,
+						y: middleBarY,
+						width: middleBarWidth,
+						height: barHeight,
+						fillStyle: middleEnergy > 0 ? '#FFD700' : '#D3D3D3' // Full color if > 0, light grey if 0
+					});
+
+					// Label for middle energy bar
+					drawText({
+						ctx,
+						text: 'PR',
+						x: textX,
+						y: middleBarY + barHeight / 2,
+						color: '#FFFFFF',
+						textAlign: 'right',
+					});
+
+					// Draw bottom energy bar
+					const bottomBarY = middleBarY + barHeight + spacing; // Bottom bar's Y position
+					const bottomBarWidth = (barWidth * bottomEnergy) / 100; // Scale width based on energy value
+					drawRectangle({
+						ctx,
+						x: barX,
+						y: bottomBarY,
+						width: bottomBarWidth,
+						height: barHeight,
+						fillStyle: bottomEnergy > 0 ? '#33C1FF' : '#D3D3D3' // Full color if > 0, light grey if 0
+					});
+					// Label for bottom energy bar
+					drawText({
+						ctx,
+						text: 'PL',
+						x: textX,
+						y: bottomBarY + barHeight / 2,
+						color: '#FFFFFF',
+						textAlign: 'right',
+					});
+                }
 
 				// Function to draw the Bowl
                 function drawBowl(ctx) {
@@ -425,102 +647,8 @@
 					ctx.fill();
 				}
 
-				// Function to draw the HUD
-                function drawHUD(ctx) {
-					// Draw HUD background
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                    ctx.fillRect(0, 0, hudWidth, hudHeight);
 
-                    // Draw current game state
-					drawGameState(ctx);
-
-					// Draw the timer
-    				drawTimer(ctx);
-
-					// Draw the energy bars
-					drawEnergyBars(ctx);
-                }
-
-				// Function to draw the game state
-				function drawGameState(ctx) {
-					// Draw the current game state
-					const gameStateFontSize = 20;
-					const gameStateX = hudTimerOffset / 2; // X position of the game state text
-					ctx.fillStyle = '#FFFFFF';
-					ctx.font = gameStateFontSize + 'px Arial';
-					ctx.textAlign = 'center'; // Center-align the text
-					ctx.fillText(gameStates[gameStateIndex], gameStateX, hudHeightMid);
-				}
-
-				// Function to draw the Timer
-				function drawTimer(ctx) {
-					// Draw the timer bar
-					const timerBarWidth = barWidth * (timerLapsed / timerDuration[gameStateIndex]); // Scale width based on remaining time
-					const timerBarX = hudTimerOffset; // Position the timer bar to the right of the game state
-					const timerBarY = spacing; // Y position of the timer bar
-
-					// Draw the background (light grey bar)
-					ctx.fillStyle = '#D3D3D3'; // Light grey color
-					ctx.fillRect(timerBarX, timerBarY, barWidth, barHeight);
-
-					// Draw the timer bar (foreground)
-					ctx.fillStyle = '#FFD700'; // Example color for the timer bar
-					ctx.fillRect(timerBarX, timerBarY, timerBarWidth, barHeight);
-
-					// Draw the timer buttons (circles)
-					buttons.forEach((button, index) => {
-						const {x, y, svgPath, style} = button;
-
-						// Draw the circle
-						ctx.beginPath();
-						ctx.arc(x, y, buttonRadius, 0, Math.PI * 2);
-						ctx.fillStyle = '#AAAAAA'; // Light grey color for the circle
-						ctx.fill();
-						ctx.strokeStyle = '#000000'; // Black border for the circle
-						ctx.stroke();
-
-						// Draw the svg
-						const svgHeight = buttonDiameter * 0.65; // Scale the SVG icon to fit inside the circle
-						const svgX = x - (svgHeight * 0.5); // Center the SVG icon in the circle
-						const svgY = y - (svgHeight * 0.5); // Center the SVG icon in the circle
-						drawSVGPath(ctx, button.svgPath, svgX, svgY, svgHeight, '#000000', style); // Draw the SVG icon
-					});
-
-				}
-
-				// Function to draw the energy bars
-				function drawEnergyBars(ctx) {
-					// Calculate rectangle dimensions
-					const bottomRectY = spacing + barHeight + spacing; // Bottom rectangle's Y position
-
-					// Draw top energy bar
-					ctx.fillStyle = topEnergy > 0 ? '#FF5733' : '#D3D3D3'; // Full color if > 0, light grey if 0
-					const topBarWidth = (barWidth * topEnergy) / 100; // Scale width based on energy value
-					ctx.fillRect(hudWidth - barWidth - spacing, spacing, topBarWidth, barHeight);
-
-					// Label for top energy bar
-					ctx.fillStyle = '#FFFFFF'; // White color for the label
-					ctx.font = '15px Arial';
-					ctx.textAlign = 'right'; // Align text to the right
-					ctx.textBaseline = 'middle'; // Vertically center the text
-					ctx.fillText('A', hudWidth - barWidth - spacing - spacing, spacing + barHeight / 2);
-
-
-					// Draw bottom energy bar
-					ctx.fillStyle = bottomEnergy > 0 ? '#33C1FF' : '#D3D3D3'; // Full color if > 0, light grey if 0
-					const bottomBarWidth = (barWidth * bottomEnergy) / 100; // Scale width based on energy value
-					ctx.fillRect(hudWidth - barWidth - spacing, bottomRectY, bottomBarWidth, barHeight);
-
-					// Label for bottom energy bar
-					ctx.fillStyle = '#FFFFFF'; // White color for the label
-					ctx.font = '15px Arial';
-					ctx.textAlign = 'right'; // Align text to the right
-					ctx.textBaseline = 'middle'; // Vertically center the text
-					ctx.fillText('B', hudWidth - barWidth - spacing - spacing, bottomRectY + barHeight / 2);
-				}
-
-
-				// Draw - Helpers
+				// Canvas Helpers
 
 				// Helper function to draw SVG
 				function drawSVGPath(ctx, svgPathData, x, y, size, color, style = "fill") {
@@ -557,9 +685,38 @@
 					ctx.restore();
 				}
 
+				function drawRectangle({ctx, x, y, width, height, fillStyle = null}) {
+					if(fillStyle) {
+						ctx.fillStyle = fillStyle;
+						ctx.fillRect(x, y, width, height);
+					}
+				}
+
+				function drawCircle({ctx, x, y, radius, fillStyle = null, strokeStyle = null, lineWidth = 1}) {
+					ctx.beginPath();
+					ctx.arc(x, y, radius, 0, Math.PI * 2);
+					if(fillStyle) {
+						ctx.fillStyle = fillStyle;
+						ctx.fill();
+					}
+					if(strokeStyle) {
+						ctx.strokeStyle = strokeStyle;
+						ctx.lineWidth = lineWidth; 
+						ctx.stroke();
+					}
+					ctx.closePath();
+				}
+
+				function drawText({ctx, text, x, y, fontSize = 15, color = '#000000', textAlign = 'center', textBaseline = 'middle'}) {
+					ctx.fillStyle = color;
+					ctx.font = `${fontSize}px Arial`;
+					ctx.textAlign = textAlign;
+					ctx.textBaseline = textBaseline;
+					ctx.fillText(text, x, y);
+				}
 
 				// // // // // // //
-				// Handlers
+				// Event Handlers
 
 				// Function to handle button clicks
 				function handleButtonClick(event) {
@@ -610,21 +767,9 @@
 				// Event listener for the "Next Stage" button
 				$('#next-state-button').click(nextGameState);
 				
-
-				// Resize canvas on document load
-				resizeCanvas();
 				// Resize canvas on window resize
 				$(window).resize(resizeCanvas);
-
-
-				// // // // // // //
-				// Set Intervals
-
-				// Set a timer to redraw the canvas every 1000 milliseconds
-				setInterval(function(){
-					updateCanvas();
-					drawCanvas();
-				}, 1000);
+				
 			});
 		</script>
 	</body>
